@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
+use App\Models\Candidat;
+use App\Models\Monitor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,10 +44,59 @@ class GestionUserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show()
     {
-        //
+        $email = request()->route('email');
+        $user = DB::table('users')->where('email', $email)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $userData = [
+            'name' => $user->name,
+            'email' => $user->email,
+        ];
+
+        // Convertir la chaîne JSON en tableau associatif
+        $roles = json_decode($user->level, true);
+
+        $additionalData = [];
+
+        foreach ($roles as $role) {
+           
+            if ($role === 'candidat') {
+                // Si l'utilisateur est candidat, on récupère les données de la table candidats
+                $candidat = DB::table('candidats')->where('id', $user->id)->first();
+              //  dd($candidat);
+
+                if ($candidat) {
+                    $candidatData = [
+                        'cin' => $candidat->cin,
+                        'adresse' => $candidat->adresse,
+                        'date_of_birth' => $candidat->date_of_birth,
+                        'num_tel' => $candidat->num_tel,
+                    ];
+                    $additionalData['candidat'] = $candidatData;
+                }
+            } elseif ($role === 'monitor') {
+                // Si l'utilisateur est moniteur, on récupère les données de la table monitors
+                $monitor = DB::table('monitors')->where('id', $user->id)->first();
+                if ($monitor) {
+                    $monitorData = [
+                        'num_professional' => $monitor->num_professional,
+                        'num_cin' => $monitor->num_cin,
+                    ];
+                    $additionalData['monitor'] = $monitorData;
+                }
+            }
+        }
+        $data['user'] = $userData;
+        $data['autre'] = $additionalData;
+
+        return response()->json($data);
     }
+
 
     /**
      * Update the specified resource in storage.

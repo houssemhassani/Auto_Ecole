@@ -108,7 +108,7 @@ const routes = [
   },
   {
     path: '/admin/gestioncandidat/assignCourse',
-    name: 'assignCourse',
+    name: 'assignRole',
     meta: { requiresAuth: true },
     component: () => import("../pages/Admin/Gestion Utilisateur/Gestion Candidat/AssignCourse.vue")
 

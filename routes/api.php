@@ -24,6 +24,8 @@ use App\Http\Controllers\Api\UserController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/logout', [UserController::class, 'logout'])->name('logout');
     Route::get('/gestionUser/AllUsers', [GestionUserController::class, 'index'])->name('index');
+    Route::get('/gestionUser/{email}', [GestionUserController::class, 'show'])->name('show');
+
     Route::resource('roles', RoleController::class);
     //Route::resource('/gestionmonitor', MonitorController::class);
     Route::delete('/gestionUser/destroy/{userId}', [GestionUserController::class, 'destroy'])->name('destroy');

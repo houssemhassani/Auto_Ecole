@@ -20,7 +20,7 @@
   import FullCalendar from '@fullcalendar/vue3'
   import dayGridPlugin from '@fullcalendar/daygrid'
   import interactionPlugin from '@fullcalendar/interaction'
-  import axios from '@/axios-config'; 
+  import axios from '@/axios-config';
   
   export default {
     components: {
@@ -32,7 +32,11 @@
           plugins: [dayGridPlugin, interactionPlugin],
           initialView: 'dayGridMonth',
           weekends: true,
-          events: []
+          events: [],
+          dateClick: this.handleDateClick,
+          validRange: {
+            start: new Date().toISOString().substring(0, 10),
+          }
         }
       }
     },
@@ -49,23 +53,30 @@
           }
         }
       },
-      fetchData() {
-        axios.get('/gestioncour/allCours')
-          .then(response => {
-            this.calendarOptions.events = response.data.cours.map(event => ({
-              title: event.titre,
-              id: event.id,
-              start: event.date_debut,
-              end: event.date_fin,
-            }))
-          })
-          .catch(error => {
-            console.error('Erreur lors de la récupération des données:', error)
-          })
+      async fetchData() {
+        try {
+          const response = await axios.get('/gestioncour/allCours');
+          const events = response.data.cours.map(event => ({
+            title: event.titre,
+            id: event.id,
+            start: event.date_debut,
+            end: event.date_fin,
+          }));
+          this.calendarOptions.events = events;
+        } catch (error) {
+          console.error('Erreur lors de la récupération des données:', error);
+        }
+      },
+      handleDateClick(info) {
+        const confirmMessage = `Voulez-vous ajouter un cours pour le jour ${info.dateStr} ?`;
+        if (confirm(confirmMessage)) {
+          // Redirection vers CreateCour.vue avec la date sélectionnée
+          this.$router.push({ name: 'CreateCour', query: { date: info.dateStr } });
+        }
       }
     },
     mounted() {
-      this.fetchData()
+      this.fetchData();
     }
   }
   </script>

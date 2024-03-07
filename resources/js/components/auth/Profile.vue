@@ -1,161 +1,164 @@
 <template>
     <div id="app">
-
-    </div>
-    <div class="page-holder bg-gray-100">
-        <header class="header bg-white shadow align-self-end py-3 px-xl-5 w-100">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6 text-center text-md-start fw-bold">
-                        <p class="mb-2 mb-md-0 fw-bold">Aut-Ecole</p>
-                    </div>
-                    <div class="col-md-6 text-center text-md-end text-gray-400">
-                        <p class="mb-0" v-if="currentUser">{{ currentUser?.name }}</p>
+        <div class="page-holder bg-light">
+            <header class="header bg-info shadow align-self-end py-3 px-xl-5 w-100">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6 text-center text-md-start fw-bold">
+                            <p class="mb-2 mb-md-0 fw-bold">Aut-Ecole</p>
+                        </div>
+                        <div class="col-md-6 text-center text-md-end text-gray-400">
+                            <p class="mb-0" v-if="userData">{{ userData.name }}</p>
+                        </div>
                     </div>
                 </div>
+            </header>
+            <div class="container-fluid px-lg-4 px-xl-5 contentDiv">
+                <section>
+                    <div class="row">
+                        <div class="col-lg-18" v-if="!editMode">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4 class="card-heading">My Profile</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div v-if="userData">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Name</strong>
+                                            <p>{{ userData.name }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong class="form-label">Email</strong>
+                                            <p>{{ userData.email }}</p>
+                                        </div>
+                                    </div>
+                                    <div v-if="additionalData.candidat">
+                                        <div class="mb-3">
+                                            <strong class="form-label">CIN</strong>
+                                            <p>{{ additionalData.candidat.cin }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong class="form-label">Address</strong>
+                                            <p>{{ additionalData.candidat.adresse }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong class="form-label">Date of Birth</strong>
+                                            <p>{{ formatDate(additionalData.candidat.date_of_birth) }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong class="form-label">Phone Number</strong>
+                                            <p>{{ additionalData.candidat.num_tel }}</p>
+                                        </div>
+                                    </div>
+                                    <div v-if="additionalData.monitor">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Professional Number</strong>
+                                            <p>{{ additionalData.monitor.num_professional }}</p>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong class="form-label">CIN</strong>
+                                            <p>{{ additionalData.monitor.num_cin }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-18">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h4 class="card-heading">Edit Profile</h4>
+                                </div>
+                                <div class="card-footer" v-if="!editMode">
+                                    <button @click="toggleEditMode" class="btn btn-primary">Modifier mes
+                                        données</button>
+                                </div>
+                                <div class="card-body" v-else>
+                                    <form @submit.prevent="updateProfile">
+                                        <div class="mb-3">
+                                            <strong class="form-label">Name</strong>
+                                            <input class="form-control" v-model="formData.name" placeholder="Your name">
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong class="form-label">Email</strong>
+                                            <input class="form-control" v-model="formData.email"
+                                                placeholder="you@domain.com" disabled>
+                                        </div>
+                                        <div v-if="additionalData.candidat">
+                                            <div class="mb-3">
+                                                <strong class="form-label">CIN</strong>
+                                                <input class="form-control" v-model="formData.cin" placeholder="CIN">
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong class="form-label">Address</strong>
+                                                <input class="form-control" v-model="formData.address"
+                                                    placeholder="Address">
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong class="form-label">Date of Birth</strong>
+                                                <input class="form-control" v-model="formData.dateOfBirth" type="date">
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong class="form-label">Phone Number</strong>
+                                                <input class="form-control" v-model="formData.phoneNumber"
+                                                    placeholder="Phone Number">
+                                            </div>
+                                        </div>
+                                        <div v-if="additionalData.monitor">
+                                            <div class="mb-3">
+                                                <strong class="form-label">Professional Number</strong>
+                                                <input class="form-control" v-model="formData.professionalNumber"
+                                                    placeholder="Professional Number">
+                                            </div>
+                                            <div class="mb-3">
+                                                <strong class="form-label">CIN</strong>
+                                                <input class="form-control" v-model="formData.cin" placeholder="CIN">
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </header>
-        <div class="container-fluid px-lg-4 px-xl-5 contentDiv">
-            <!-- Page Header-->
-
-            <section>
-                <div class="row">
-                    <div class="col-lg-4">
-
-
-                        <form class="card mb-4">
-                            <div class="card-header">
-                                <h4 class="card-heading">My Profile</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="row mb-3">
-                                    <div class="col-auto d-flex align-items-center"><img class="avatar avatar-lg p-1"
-                                            src="https://therichpost.com/wp-content/uploads/2021/03/avatar2.png"
-                                            alt="Avatar"></div>
-                                    <div class="col">
-                                        <label class="form-label">Name</label>
-                                        <input class="form-control" placeholder="Your name">
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Bio</label>
-                                    <textarea class="form-control"
-                                        rows="8">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Email</label>
-                                    <input class="form-control" placeholder="you@domain.com">
-                                </div>
-                                <label class="form-label">Password</label>
-                                <input class="form-control" type="password" value="password">
-                            </div>
-                            <div class="card-footer text-end">
-                                <button class="btn btn-primary">Save</button>
-                            </div>
-                        </form>
+            <footer class="footer bg-white shadow align-self-end py-3 px-xl-5 w-100">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6 text-center text-md-start fw-bold">
+                            <p class="mb-2 mb-md-0 fw-bold">Auto-Ecole © 2024</p>
+                        </div>
+                        <div class="col-md-6 text-center text-md-end text-gray-400">
+                            <p class="mb-0" v-if="userData">{{ userData.name }}</p>
+                        </div>
                     </div>
-
-                    <form class="card mb-4">
-                        <div class="card-header">
-                            <h4 class="card-heading">Edit Profile</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-5">
-                                    <div class="mb-4">
-                                        <label class="form-label">Company</label>
-                                        <input class="form-control" type="text" placeholder="Company" value="Jassa Rich">
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    <div class="mb-4">
-                                        <label class="form-label">Username</label>
-                                        <input class="form-control" type="text" placeholder="Username" value="Jassa">
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">Email address</label>
-                                        <input class="form-control" type="email" placeholder="Email">
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="mb-4">
-                                        <label class="form-label">First Name</label>
-                                        <input class="form-control" type="text" placeholder="First name">
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-6">
-                                    <div class="mb-4">
-                                        <label class="form-label">Last Name</label>
-                                        <input class="form-control" type="text" placeholder="Last Name">
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="mb-4">
-                                        <label class="form-label">Address</label>
-                                        <input class="form-control" type="text" placeholder="Home Address">
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-4">
-                                    <div class="mb-4">
-                                        <label class="form-label">City</label>
-                                        <input class="form-control" type="text" placeholder="City">
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-md-3">
-                                    <div class="mb-4">
-                                        <label class="form-label">ZIP</label>
-                                        <input class="form-control" type="number" placeholder="ZIP">
-                                    </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="mb-4">
-                                        <label class="form-label">Country</label>
-                                        <select class="form-control custom-select">
-                                            <option value="">UK</option>
-                                            <option value="">US</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="mb-0">
-                                        <label class="form-label">About Me</label>
-                                        <textarea class="form-control" rows="5"
-                                            placeholder="Here can be your description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer text-end">
-                            <button class="btn btn-primary" type="submit">Update Profile</button>
-                        </div>
-                    </form>
                 </div>
-
-            </section>
+            </footer>
         </div>
-        <footer class="footer bg-white shadow align-self-end py-3 px-xl-5 w-100">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6 text-center text-md-start fw-bold">
-                        <p class="mb-2 mb-md-0 fw-bold">Auto-Ecole © 2024</p>
-                    </div>
-                    <div class="col-md-6 text-center text-md-end text-gray-400">
-                        <p class="mb-0" v-if="currentUser">{{ currentUser.name }}</p>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </div>
 </template>
-  
-<script >
+
+<script>
 import "bootstrap/dist/css/bootstrap.min.css";
+import axios from '@/axios-config';
+
 export default {
     data() {
         return {
-            currentUser: null
+            userData: {},
+            additionalData: {},
+            formData: {
+                name: '',
+                email: '',
+                cin: '',
+                address: '',
+                dateOfBirth: '',
+                phoneNumber: '',
+                professionalNumber: ''
+            },
+            editMode: false
         };
     },
     mounted() {
@@ -163,12 +166,57 @@ export default {
     },
     methods: {
         getCurrentUser() {
-            const currentUser = localStorage.getItem('currentUser');
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
             if (currentUser) {
-                this.currentUser = JSON.parse(currentUser);
-                console.log(this.currentUser)
+                this.userData = currentUser;
+                this.loadAdditionalData(currentUser.email);
             }
+        },
+        formatDate(dateString) {
+            if (!dateString) return ''; // Vérifie si la date est définie
+
+            const date = new Date(dateString); // Convertit la chaîne de date en objet Date
+            const options = { year: 'numeric', month: 'long', day: 'numeric' }; // Options de formatage de la date
+            return date.toLocaleDateString('fr-FR', options); // Formate la date selon les options spécifiées
+        },
+        loadAdditionalData(email) {
+            axios.get(`/gestionUser/${email}`)
+                .then(response => {
+                    this.additionalData = response.data.autre;
+                    this.fillFormData(response.data.user);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+        toggleEditMode() {
+            // Toggle edit mode
+            this.editMode = !this.editMode;
+        },
+        fillFormData(user) {
+            this.formData.name = user.name;
+            this.formData.email = user.email;
+            this.formData.cin = this.additionalData.candidat ? this.additionalData.candidat.cin : '';
+            this.formData.address = this.additionalData.candidat ? this.additionalData.candidat.adresse : '';
+            this.formData.dateOfBirth = this.additionalData.candidat ? this.additionalData.candidat.date_of_birth : '';
+            this.formData.phoneNumber = this.additionalData.candidat ? this.additionalData.candidat.num_tel : '';
+            this.formData.professionalNumber = this.additionalData.monitor ? this.additionalData.monitor.num_professional : '';
+        },
+        updateProfile() {
+            // Envoyer les données mises à jour au backend
+            this.editMode = false;
+            console.log("Updating profile...", this.formData);
         }
     }
 };
 </script>
+
+<style scoped>
+.page-holder {
+    min-height: 100vh;
+}
+
+.contentDiv {
+    min-height: calc(100vh - 160px);
+}
+</style>
