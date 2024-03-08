@@ -48,8 +48,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show/{id}', [MonitorController::class, 'show'])->name('monitor.show');
         Route::delete('/destroy/{id}', [MonitorController::class, 'destroy'])->name('monitor.destroy');
         Route::get('/allmonitors', [MonitorController::class, 'index'])->name('monitor.index');
+        Route::post('/updateProfile',[MonitorController::class,'update'])->name('monitor.updateProfile');
 
     });
+
 
     Route::prefix('/gestioncandidat')->group(function () {
         Route::post('/store', [CandidatController::class, 'store'])->name('candidat.store');
@@ -57,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show/{id}', [CandidatController::class, 'show'])->name('candidat.show');
         Route::delete('/destroy/{id}', [CandidatController::class, 'destroy'])->name('candidat.destroy');
         Route::get('/allcandidats', [CandidatController::class, 'index'])->name('candidat.index');
+        Route::post('/updateProfile',[CandidatController::class,'update'])->name('monitor.updateProfile');
         Route::get('/courses/without-candidates', [CandidatController::class, 'getCoursesWithoutCandidates']);
     });
 

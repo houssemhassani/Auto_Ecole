@@ -47,8 +47,9 @@ class GestionUserController extends Controller
     public function show()
     {
         $email = request()->route('email');
+        
         $user = DB::table('users')->where('email', $email)->first();
-
+        //dd($user);
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
         }
@@ -58,13 +59,13 @@ class GestionUserController extends Controller
             'email' => $user->email,
         ];
 
-        // Convertir la chaîne JSON en tableau associatif
+       
         $roles = json_decode($user->level, true);
 
         $additionalData = [];
 
         foreach ($roles as $role) {
-           
+           //dd($role);
             if ($role === 'candidat') {
                 // Si l'utilisateur est candidat, on récupère les données de la table candidats
                 $candidat = DB::table('candidats')->where('id', $user->id)->first();

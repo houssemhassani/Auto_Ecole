@@ -90,6 +90,47 @@ class CandidatController extends Controller
             return response()->json(['message' => 'Erreur lors de l\'ajout de l\'utilisateur et du moniteur', 'error' => $e->getMessage()], 422);
         }
     }
+    public function update(Request $request)
+    {
+        try {
+            $request->validate([
+                'cin' => 'required|string',
+                'name' => 'required|string',
+                'date_of_birth' => 'nullable|date_format:Y-m-d',
+                'num_tel' => 'nullable|string',
+                'email' => 'required|string|email',
+                'address' => 'required|string'
+            ]);
+
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                return response()->json(['message' => 'Candidat non trouvé'], 404);
+            }
+
+            $user->name = $request->name;
+            $user->save();
+
+            $candidat = Candidat::where('email', $user->email)->first();
+
+            if (!$candidat) {
+                return response()->json(['message' => 'Candidat non trouvé'], 404);
+            }
+
+            $candidat->num_tel = $request->num_tel;
+            $candidat->date_of_birth = $request->date_of_birth;
+            $candidat->adresse = $request->address;
+            $candidat->save();
+
+            $data['candidat'] = $candidat;
+            $data['user'] = $user;
+
+            return response()->json($data, 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erreur', 'error' => $e->getMessage()]);
+        }
+    }
+
     public function getCoursesWithoutCandidates()
     {
         try {

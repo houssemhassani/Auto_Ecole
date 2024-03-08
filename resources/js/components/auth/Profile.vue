@@ -86,7 +86,8 @@
                                         <div v-if="additionalData.candidat">
                                             <div class="mb-3">
                                                 <strong class="form-label">CIN</strong>
-                                                <input class="form-control" v-model="formData.cin" placeholder="CIN">
+                                                <input class="form-control" v-model="formData.cin" placeholder="CIN"
+                                                    disabled>
                                             </div>
                                             <div class="mb-3">
                                                 <strong class="form-label">Address</strong>
@@ -95,11 +96,12 @@
                                             </div>
                                             <div class="mb-3">
                                                 <strong class="form-label">Date of Birth</strong>
-                                                <input class="form-control" v-model="formData.dateOfBirth" type="date">
+                                                <input class="form-control" v-model="formData.date_of_birth"
+                                                    type="date">
                                             </div>
                                             <div class="mb-3">
                                                 <strong class="form-label">Phone Number</strong>
-                                                <input class="form-control" v-model="formData.phoneNumber"
+                                                <input class="form-control" v-model="formData.num_tel"
                                                     placeholder="Phone Number">
                                             </div>
                                         </div>
@@ -154,8 +156,8 @@ export default {
                 email: '',
                 cin: '',
                 address: '',
-                dateOfBirth: '',
-                phoneNumber: '',
+                date_of_birth: '',
+                num_tel: '',
                 professionalNumber: ''
             },
             editMode: false
@@ -173,16 +175,17 @@ export default {
             }
         },
         formatDate(dateString) {
-            if (!dateString) return ''; // Vérifie si la date est définie
-
-            const date = new Date(dateString); // Convertit la chaîne de date en objet Date
-            const options = { year: 'numeric', month: 'long', day: 'numeric' }; // Options de formatage de la date
-            return date.toLocaleDateString('fr-FR', options); // Formate la date selon les options spécifiées
+            if (!dateString) return ''; 
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' }; 
+            return date.toLocaleDateString('fr-FR', options); 
         },
         loadAdditionalData(email) {
             axios.get(`/gestionUser/${email}`)
                 .then(response => {
+
                     this.additionalData = response.data.autre;
+                    // console.log(this.additionalData)
                     this.fillFormData(response.data.user);
                 })
                 .catch(error => {
@@ -190,7 +193,7 @@ export default {
                 });
         },
         toggleEditMode() {
-            // Toggle edit mode
+            
             this.editMode = !this.editMode;
         },
         fillFormData(user) {
@@ -198,17 +201,70 @@ export default {
             this.formData.email = user.email;
             this.formData.cin = this.additionalData.candidat ? this.additionalData.candidat.cin : '';
             this.formData.address = this.additionalData.candidat ? this.additionalData.candidat.adresse : '';
-            this.formData.dateOfBirth = this.additionalData.candidat ? this.additionalData.candidat.date_of_birth : '';
-            this.formData.phoneNumber = this.additionalData.candidat ? this.additionalData.candidat.num_tel : '';
+            this.formData.date_of_birth = this.additionalData.candidat ? this.additionalData.candidat.date_of_birth : '';
+            this.formData.num_tel = this.additionalData.candidat ? this.additionalData.candidat.num_tel : '';
             this.formData.professionalNumber = this.additionalData.monitor ? this.additionalData.monitor.num_professional : '';
         },
+
         updateProfile() {
-            // Envoyer les données mises à jour au backend
-            this.editMode = false;
-            console.log("Updating profile...", this.formData);
+           
+            if (this.additionalData.candidat) {
+                
+                const updatedData = {
+                    name: this.formData.name,
+                    email: this.formData.email,
+                    cin: this.formData.cin,
+                    address: this.formData.address,
+                    date_of_birth: this.formatDateForBackend(this.formData.date_of_birth),
+                    num_tel: this.formData.num_tel
+                };
+
+               
+                axios.post('/gestioncandidat/updateProfile', updatedData)
+                    .then(response => {
+                        console.log("Profile updated successfully", response.data);
+                        localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+                        this.editMode = false; 
+                    })
+                    .catch(error => {
+                        console.error("Error updating profile", error);
+                    });
+            } else {
+                if (this.additionalData.monitor) {
+                    
+                    const updatedData = {
+                        name: this.formData.name,
+                        email: this.formData.email,
+                        professionalNumber: this.formData.professionalNumber
+                    };
+
+                    
+                    axios.post('/gestioncandidat/updateProfile', updatedData)
+                        .then(response => {
+                            console.log("Profile updated successfully", response.data);
+                            localStorage.setItem('currentUser', JSON.stringify(response.data.user));
+                            this.editMode = false;
+                        })
+                        .catch(error => {
+                            console.error("Error updating profile", error);
+                        });
+                } else {
+                    console.log("admin");
+                    this.editMode = false;
+                }
+            }
+        },
+        formatDateForBackend(dateString) {
+            
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = ('0' + (date.getMonth() + 1)).slice(-2);
+            const day = ('0' + date.getDate()).slice(-2);
+            return `${year}-${month}-${day}`;
         }
+
     }
-};
+}
 </script>
 
 <style scoped>
