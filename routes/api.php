@@ -59,8 +59,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show/{id}', [CandidatController::class, 'show'])->name('candidat.show');
         Route::delete('/destroy/{id}', [CandidatController::class, 'destroy'])->name('candidat.destroy');
         Route::get('/allcandidats', [CandidatController::class, 'index'])->name('candidat.index');
-        Route::post('/updateProfile',[CandidatController::class,'update'])->name('monitor.updateProfile');
+        Route::post('/updateProfile',[CandidatController::class,'update'])->name('candidat.updateProfile');
         Route::get('/courses/without-candidates', [CandidatController::class, 'getCoursesWithoutCandidates']);
+        Route::get('/{candidatId}/courses', [CandidatController::class, 'getCoursesByCandidateId']);
+        Route::post('/assign-course/{candidatId}', [CandidatController::class, 'assignCourse'])->name('candidat.assignCourse');
     });
 
     Route::post('/gestionautoecole/store', [AutoEcoleController::class, 'store'])->name('autoecole.store');

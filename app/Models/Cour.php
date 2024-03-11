@@ -14,6 +14,10 @@ class Cour extends Model
         'date_fin',
         'nombre_heures'
     ];
+    public function candidats()
+    {
+        return $this->belongsToMany(Candidat::class);
+    }
 
     public function monitor()
     {

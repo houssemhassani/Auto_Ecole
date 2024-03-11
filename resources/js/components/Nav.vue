@@ -12,7 +12,7 @@
               <router-link class="nav-link" to="/">Home</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/admin/gestioncour/allCours">Manage Course</router-link>
+              <router-link class="nav-link" to="/my-courses">Manage Course</router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link" to="/admin/gestioncandidat/">Manage Candidat</router-link>
@@ -26,9 +26,7 @@
             <li class="nav-item">
               <router-link class="nav-link" to="/admin/role">Manage Role</router-link>
             </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/admin/gestioncandidat/assignCourse">Assign Course</router-link>
-            </li>
+            
             <li class="nav-item">
                   <button class="dropdown-item" @click="logout">Logout</button>
                 </li>

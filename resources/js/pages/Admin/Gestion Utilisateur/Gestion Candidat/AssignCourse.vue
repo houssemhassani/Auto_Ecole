@@ -1,62 +1,100 @@
 <template>
-    <div class="container mt-5">
-      <h1 class="mb-4">Cours non assignés à aucun candidat</h1>
-      <div class="row">
-        <div v-for="course in courses" :key="course.id" class="col-md-4 mb-4">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" :value="course.id" v-model="selectedCourses">
-            <label class="form-check-label">
-              <h5>{{ course.titre }}</h5>
-              <p>{{ course.description }}</p>
-              <p><strong>Date de début:</strong> {{ formatDate(course.date_debut) }}</p>
-              <p><strong>Date de fin:</strong> {{ formatDate(course.date_fin) }}</p>
-              <p><strong>Nombre d'heures:</strong> {{ course.nombre_heures }}</p>
-            </label>
+  <div>
+
+    <div>
+      <div class="parallax-container">
+        <img src="../../../../images/coursdisponible.png" alt="Image" class="parallax">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4" v-for="course in courses" :key="course.id">
+        <div class="card mb-3" style="background-color: #F8F9FA;">
+          <div class="card-body">
+            <h5 class="card-title" style="color: #000;">{{ course.titre }}</h5>
+            <p class="card-text" style="color: #000;">Date de début : {{ course.date_debut }}</p>
+            <button class="btn btn-primary" @click="assignCourse(course.id)">Attribuer</button>
           </div>
         </div>
       </div>
-      <div class="mt-4">
-        <button @click="assignCourses" class="btn btn-primary">Assigner les cours sélectionnés</button>
-      </div>
     </div>
-  </template>
-  
-  <script>
+  </div>
+</template>
+
+<script>
 import axios from '@/axios-config';
-  
-  export default {
-    data() {
-      return {
-        courses: [],
-        selectedCourses: [],
-      };
-    },
-    mounted() {
-      this.getCoursesWithoutCandidates();
-    },
-    methods: {
-      async getCoursesWithoutCandidates() {
-        try {
-          const response = await axios.get('/gestioncandidat/courses/without-candidates');
+
+export default {
+  data() {
+    return {
+      courses: [],
+      candidatId: null
+    };
+  },
+  mounted() {
+
+    this.getCoursesWithoutCandidates();
+    const parallaxElem = document.querySelector('.parallax');
+    parallaxElem.classList.add('parallax-animation');
+  },
+  methods: {
+    getCoursesWithoutCandidates() {
+      axios.get('/gestioncandidat/courses/without-candidates')
+        .then(response => {
           this.courses = response.data.courses;
-        } catch (error) {
-          console.error('Erreur lors de la récupération des cours non assignés :', error);
-        }
-      },
-      async assignCourses() {
-        // Implémentez la logique pour assigner les cours sélectionnés au candidat
-        console.log('Cours sélectionnés:', this.selectedCourses);
-      },
-      formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        const date = new Date(dateString);
-        return date.toLocaleString('fr-FR', options);
-      },
+        })
+        .catch(error => {
+          console.error(error);
+        });
     },
-  };
-  </script>
-  
-  <style scoped>
-  /* Styles CSS spécifiques au composant */
-  </style>
-  
+    assignCourse(courseId) {
+      console.log(this.$route.params.candidatId);
+      axios.post(`/gestioncandidat/assign-course/${this.$route.params.candidatId}`, { cour_id: courseId })
+        .then(response => {
+          console.log(response.data.message);
+          this.getCoursesWithoutCandidates();
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
+  }
+};
+</script>
+
+<style scoped>
+.parallax-container {
+  position: relative;
+  overflow: inherit;
+  width: 70%;
+  height: 250px;
+}
+
+.parallax {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  animation: parallaxTranslate 5s infinite alternate;
+  /* Ajustez la durée et le délai selon vos besoins */
+}
+
+@keyframes parallaxTranslate {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(50%);
+  }
+}
+
+.card {
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 0 11px rgba(33, 33, 33, .2);
+}
+</style>

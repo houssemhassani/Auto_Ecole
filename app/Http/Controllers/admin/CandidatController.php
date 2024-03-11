@@ -134,14 +134,28 @@ class CandidatController extends Controller
     public function getCoursesWithoutCandidates()
     {
         try {
-            $courses = Cour::leftJoin('candidats', 'cours.id', '=', 'candidats.cour_id')
-                ->whereNull('candidats.cour_id')
-                ->select('cours.*')
+            // Sélectionner tous les cours qui ne sont pas associés à des candidats via la table de liaison candidat_course
+            $courses = Cour::whereDoesntHave('candidats')
+                ->orderByRaw('ABS(DATEDIFF(NOW(), date_debut))')
                 ->get();
 
             return response()->json(['courses' => $courses], 200);
         } catch (Exception $e) {
             return response()->json(['message' => 'Erreur lors de la récupération des cours non assignés', 'error' => $e->getMessage()], 422);
+        }
+    }
+    public function getCoursesByCandidateId(string $candidatId)
+    {
+        try {
+            // Recherche du candidat par son ID
+            $candidat = Candidat::findOrFail($candidatId);
+
+            // Sélectionner tous les cours associés au candidat et les trier par date de début
+            $courses = $candidat->cours()->orderBy('date_debut')->get();
+
+            return response()->json(['courses' => $courses], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Erreur lors de la récupération des cours du candidat', 'error' => $e->getMessage()], 422);
         }
     }
     public function assignCourse(Request $request, string $candidatId)
@@ -151,9 +165,11 @@ class CandidatController extends Controller
                 'cour_id' => 'required|exists:cours,id',
             ]);
 
+            // Recherche du candidat par son ID
             $candidat = Candidat::findOrFail($candidatId);
-            $candidat->cour_id = $request->cour_id;
-            $candidat->save();
+
+            // Attachement du cours au candidat
+            $candidat->cours()->attach($request->cour_id);
 
             // Vous pouvez également envoyer un e-mail contenant les détails du cours assigné au candidat ici
 
@@ -162,6 +178,7 @@ class CandidatController extends Controller
             return response()->json(['message' => 'Erreur lors de l\'assignation du cours au candidat', 'error' => $e->getMessage()], 422);
         }
     }
+
     public function show(string $id)
     {
         try {

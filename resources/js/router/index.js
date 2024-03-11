@@ -107,9 +107,9 @@ const routes = [
 
   },
   {
-    path: '/admin/gestioncandidat/assignCourse',
-    name: 'assignRole',
-    meta: { requiresAuth: true },
+    path: '/admin/gestioncandidat/assignCourse/:candidatId',
+    name: 'AssignCourse',
+    //meta: { requiresAuth: true },
     component: () => import("../pages/Admin/Gestion Utilisateur/Gestion Candidat/AssignCourse.vue")
 
   },
@@ -132,6 +132,13 @@ const routes = [
     name: 'CreateRole',
     meta: { requiresAuth: true },
     component: () => import("../pages/Admin/roles/FormRole.vue")
+
+  },
+  {
+    path: '/my-courses',
+    name: 'my-courses',
+    meta: { requiresAuth: true },
+    component: () => import("../pages/Admin/Gestion Cour/MyCourses.vue")
 
   },
   {

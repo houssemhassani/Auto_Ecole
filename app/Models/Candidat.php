@@ -24,9 +24,9 @@ class Candidat extends Model
         'date_of_birth' => 'datetime',
     ];
 
-    public function cour()
+    public function cours()
     {
-        return $this->belongsTo(Cour::class);
+        return $this->belongsToMany(Cour::class);
     }
 
 
