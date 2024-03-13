@@ -1,24 +1,41 @@
 <template>
-  <div class="container mt-5">
-    <div class="weather-info">
-      <div v-if="weatherData" class="weather-info-item">
-        <div><strong>Ville:</strong> {{ weatherData.name }}</div>
-        <div><strong>Météo:</strong> {{ weatherData.weather[0].description }}</div>
-        <div><strong>Température:</strong> {{ weatherData.main.temp }}°C</div>
-        <div><strong>Humidité:</strong> {{ weatherData.main.humidity }}%</div>
-        <div><strong>Vitesse du vent:</strong> {{ weatherData.wind.speed }} m/s</div>
-      </div>
-      <div v-else class="weather-info-item">Chargement de la météo...</div>
-    </div>
-    <h1 class="mt-5 mb-4" style="color: teal;">Mes Cours</h1>
-    <div class="calendar-container">
-      <FullCalendar :options="calendarOptions" class="custom-calendar">
-        <template v-slot:eventContent="arg">
-          <div class="event-title" @click="showAlert(arg.event.id, arg.event.title)">
-            {{ arg.event.title }}
+  <div>
+    <!-- Barre de navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+      <div class="container">
+        <a class="navbar-brand" href="#">Météo</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+          <div class="weather-info navbar-text">
+            <div v-if="weatherData" class="weather-info-content">
+              <span class="weather-info-item" style="color: black;">Ville: {{ weatherData.name }}</span>
+              <span class="weather-info-item" style="color: black;">Météo: {{ weatherData.weather[0].description }}</span>
+              <span class="weather-info-item" style="color: black;">Température: {{ weatherData.main.temp }}°C</span>
+              <span class="weather-info-item" style="color: black;">Humidité: {{ weatherData.main.humidity }}%</span>
+              <span class="weather-info-item" style="color: black;">Vitesse du vent: {{ weatherData.wind.speed }} m/s</span>
+              <img :src="weatherIconUrl" alt="Weather Icon" class="weather-icon">
+            </div>
+            <div v-else>Chargement de la météo...</div>
           </div>
-        </template>
-      </FullCalendar>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <div class="container mt-5">
+      <h1 class="mb-4" style="color: teal;">Mes Cours</h1>
+      <div class="calendar-container">
+        <FullCalendar :options="calendarOptions" class="custom-calendar">
+          <template v-slot:eventContent="arg">
+            <div class="event-title" @click="showAlert(arg.event.id, arg.event.title)">
+              {{ arg.event.title }}
+            </div>
+          </template>
+        </FullCalendar>
+      </div>
     </div>
   </div>
 </template>
@@ -38,7 +55,7 @@ export default {
     return {
       weatherData: null,
       apiKey: '50cd964c75a1c6ecb67b776d7fcaa795',
-      city: 'Monastir', 
+      city: '', // La ville sera remplacée par les coordonnées géographiques obtenues
       units: 'metric',
       calendarOptions: {
         plugins: [dayGridPlugin, interactionPlugin],
@@ -52,11 +69,27 @@ export default {
       }
     }
   },
+  computed: {
+    weatherIconUrl() {
+      if (this.weatherData) {
+        return `http://openweathermap.org/img/w/${this.weatherData.weather[0].icon}.png`;
+      }
+      return '';
+    }
+  },
   methods: {
     async fetchWeatherData() {
       try {
-        const response = await axioss.get(`https://api.openweathermap.org/data/2.5/weather?q=${this.city}&appid=${this.apiKey}&units=${this.units}`);
-        this.weatherData = response.data;
+        // Demander l'autorisation à l'utilisateur pour accéder à sa position géographique
+        navigator.geolocation.getCurrentPosition(async position => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          // Utiliser les coordonnées géographiques pour récupérer les données météorologiques
+          const response = await axioss.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${this.apiKey}&units=${this.units}`);
+          this.weatherData = response.data;
+        }, error => {
+          console.error('Erreur lors de la récupération de la position géographique:', error);
+        });
       } catch (error) {
         console.error('Erreur lors de la récupération des données météorologiques:', error);
       }
@@ -95,23 +128,11 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  font-family: Arial, sans-serif;
-}
-
-.weather-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.weather-info-item {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 5px;
+.calendar-container {
+  background-color: #fefefe;
+  padding: 20px;
+  border-radius: 10px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
 }
 
 .event-title {
@@ -124,10 +145,42 @@ export default {
   text-decoration: underline;
 }
 
-.calendar-container {
-  background-color: #f0f0f0;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+.weather-info {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.weather-info-content {
+  animation: slide-in 18s linear infinite;
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.weather-info span {
+  margin-right: 50px;
+}
+
+.weather-info-item {
+  color: #050505;
+}
+
+.weather-icon {
+  width: 50px;
+  height: 50px;
+}
+
+@media (max-width: 768px) {
+  .weather-info {
+    font-size: 1.8rem;
+  }
 }
 </style>

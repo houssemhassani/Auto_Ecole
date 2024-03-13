@@ -4,7 +4,7 @@ import router from './router';
 
 const app = createApp(App); // Créez l'application Vue en utilisant createApp
 
-app.use(router); // Utilisez le router dans votre application
+app.use(router); 
 
 // Vous pouvez également inclure NowUiKit si nécessaire
 // import NowUiKit from './plugins/now-ui-kit';
