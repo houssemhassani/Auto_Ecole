@@ -142,6 +142,13 @@ const routes = [
 
   },
   {
+    path: '/my-conversations',
+    name: 'my-conversations',
+    meta: { requiresAuth: true },
+    component: () => import("../pages/chat/Chats.vue")
+
+  },
+  {
     path: '/admin/edit-role/:id',
     name: 'EditRole',
     meta: { requiresAuth: true },

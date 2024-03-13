@@ -12,6 +12,18 @@ use Illuminate\Support\Facades\DB;
 
 class GestionUserController extends Controller
 {
+
+    public function getOnlineUsers()
+    {
+        if (!auth()->check()) {
+            return response()->json(['users' => []]);
+
+        }
+
+        $users = User::where("id", "!=", auth()->user()->id)->get();
+        return response()->json(['users' => $users]);
+
+    }
     /**
      * Display a listing of the resource.
      */
@@ -47,7 +59,7 @@ class GestionUserController extends Controller
     public function show()
     {
         $email = request()->route('email');
-        
+
         $user = DB::table('users')->where('email', $email)->first();
         //dd($user);
         if (!$user) {
@@ -59,17 +71,17 @@ class GestionUserController extends Controller
             'email' => $user->email,
         ];
 
-       
+
         $roles = json_decode($user->level, true);
 
         $additionalData = [];
 
         foreach ($roles as $role) {
-           //dd($role);
+            //dd($role);
             if ($role === 'candidat') {
                 // Si l'utilisateur est candidat, on récupère les données de la table candidats
                 $candidat = DB::table('candidats')->where('id', $user->id)->first();
-              //  dd($candidat);
+                //  dd($candidat);
 
                 if ($candidat) {
                     $candidatData = [

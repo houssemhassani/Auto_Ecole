@@ -5,6 +5,8 @@ use App\Http\Controllers\admin\CourController;
 use App\Http\Controllers\Api\GestionUserController;
 use App\Http\Controllers\admin\AutoEcoleController;
 use App\Http\Controllers\admin\MonitorController;
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\DemoController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -48,18 +50,28 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/show/{id}', [MonitorController::class, 'show'])->name('monitor.show');
         Route::delete('/destroy/{id}', [MonitorController::class, 'destroy'])->name('monitor.destroy');
         Route::get('/allmonitors', [MonitorController::class, 'index'])->name('monitor.index');
-        Route::post('/updateProfile',[MonitorController::class,'update'])->name('monitor.updateProfile');
+        Route::post('/updateProfile', [MonitorController::class, 'update'])->name('monitor.updateProfile');
 
     });
+    Route::prefix('/conversations')->group(function () {
+        Route::get('/', [ChatController::class, 'index']);
 
+        // Route pour récupérer la conversation avec un utilisateur spécifique
+        Route::get('/conversation/{userId}', [ChatController::class, 'conversation']);
 
+        // Route pour envoyer un message
+        Route::post('/send', [ChatController::class, 'send']);
+
+        // Route pour supprimer un message
+        Route::delete('/delete/{id}', [ChatController::class, 'delete']);
+    });
     Route::prefix('/gestioncandidat')->group(function () {
         Route::post('/store', [CandidatController::class, 'store'])->name('candidat.store');
         // Route::get('/autoecoles', [CandidatController::class, 'create'])->name('monitor.create');
         Route::get('/show/{id}', [CandidatController::class, 'show'])->name('candidat.show');
         Route::delete('/destroy/{id}', [CandidatController::class, 'destroy'])->name('candidat.destroy');
         Route::get('/allcandidats', [CandidatController::class, 'index'])->name('candidat.index');
-        Route::post('/updateProfile',[CandidatController::class,'update'])->name('candidat.updateProfile');
+        Route::post('/updateProfile', [CandidatController::class, 'update'])->name('candidat.updateProfile');
         Route::get('/courses/without-candidates', [CandidatController::class, 'getCoursesWithoutCandidates']);
         Route::get('/{candidatId}/courses', [CandidatController::class, 'getCoursesByCandidateId']);
         Route::post('/assign-course/{candidatId}', [CandidatController::class, 'assignCourse'])->name('candidat.assignCourse');
@@ -69,6 +81,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users/{userId}/assign-roles', 'App\Http\Controllers\Api\UserController@assignRoles');
 
 });
+
+Route::get('demo', [GestionUserController::class, 'getOnlineUsers'])->name('');
 Route::post('/user/store', [UserController::class, 'store'])->name('store');
 Route::post('user/login', [UserController::class, 'login'])->name('login');
 Route::post('/user/forgot-password', [UserController::class, 'forgotPassword'])->name('password.email');
