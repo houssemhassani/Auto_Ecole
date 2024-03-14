@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\admin\CandidatController;
 use App\Http\Controllers\admin\CourController;
+use App\Http\Controllers\admin\VehiculeController;
 use App\Http\Controllers\Api\GestionUserController;
 use App\Http\Controllers\admin\AutoEcoleController;
 use App\Http\Controllers\admin\MonitorController;
@@ -48,7 +49,31 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/assign-course/{id}', [CourController::class, 'assignCourseToCandidate'])->name('cour.assignCourseToCandidate');
 
     });
+    Route::prefix('/gestionvehicules')->group(function () {
+        Route::get('/vehicules', [VehiculeController::class, 'index']);
 
+        Route::post('/addvehicules', [VehiculeController::class, 'store']);
+
+        Route::get('/vehicules/{id}', [VehiculeController::class, 'show']);
+
+        Route::put('/vehicules/{id}', [VehiculeController::class, 'update']);
+
+        Route::put('/vehicules/{vehicleId}/assign/{monitorId}', [VehiculeController::class, 'assignToMonitor']);
+
+        Route::put('/vehicules/{vehicleId}/unassign/{monitorId}', [VehiculeController::class, 'unassignFromMonitor']);
+
+        Route::get('/monitors/{monitorId}/vehicules', [VehiculeController::class, 'getVehiclesByMonitor']);
+
+        Route::delete('/vehicules/{id}', [VehiculeController::class, 'destroy']);
+
+        Route::post('/vehicules/search', [VehiculeController::class, 'search']);
+
+        Route::get('/vehicules/export/csv', [VehiculeController::class, 'exportCsv']);
+
+        Route::get('/vehicules/export/excel', [VehiculeController::class, 'exportExcel']);
+
+        Route::get('/vehicules/export/pdf', [VehiculeController::class, 'exportPdf']);
+    });
     Route::prefix('/gestionmonitor')->group(function () {
         Route::post('/store', [MonitorController::class, 'store'])->name('monitor.store');
         Route::get('/autoecoles', [MonitorController::class, 'create'])->name('monitor.create');

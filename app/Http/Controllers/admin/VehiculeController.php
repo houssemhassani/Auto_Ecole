@@ -37,7 +37,7 @@ class VehiculeController extends Controller
             'brand' => 'required|string',
             'model' => 'required|string',
             'year' => 'required|integer',
-            'registration_number' => 'required|string|unique:vehicles',
+            'registration_number' => 'required|string|unique:vehicules',
             'monitor_id' => 'required|exists:monitors,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
