@@ -12,7 +12,7 @@
             <router-link class="nav-link" to="/">Home</router-link>
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" to="/my-courses">Manage Course</router-link>
+            <router-link class="nav-link" to="/admin/gestioncour/allCours">Manage Course</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/admin/gestioncandidat/">Manage Candidat</router-link>

@@ -4,6 +4,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-success">
       <div class="container">
         <a class="navbar-brand" href="#">Météo</a>
+        <a class="navbar-brand" href="#" @click="fetchTrafficData">Trafic</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
           aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -12,10 +13,12 @@
           <div class="weather-info navbar-text">
             <div v-if="weatherData" class="weather-info-content">
               <span class="weather-info-item" style="color: black;">Ville: {{ weatherData.name }}</span>
-              <span class="weather-info-item" style="color: black;">Météo: {{ weatherData.weather[0].description }}</span>
+              <span class="weather-info-item" style="color: black;">Météo: {{ weatherData.weather[0].description
+                }}</span>
               <span class="weather-info-item" style="color: black;">Température: {{ weatherData.main.temp }}°C</span>
               <span class="weather-info-item" style="color: black;">Humidité: {{ weatherData.main.humidity }}%</span>
-              <span class="weather-info-item" style="color: black;">Vitesse du vent: {{ weatherData.wind.speed }} m/s</span>
+              <span class="weather-info-item" style="color: black;">Vitesse du vent: {{ weatherData.wind.speed }}
+                m/s</span>
               <img :src="weatherIconUrl" alt="Weather Icon" class="weather-icon">
             </div>
             <div v-else>Chargement de la météo...</div>
@@ -78,6 +81,39 @@ export default {
     }
   },
   methods: {
+    async fetchTrafficData() {
+  try {
+    // Récupérer la position géographique actuelle de l'utilisateur
+    const position = await this.getCurrentPosition();
+
+    // Utiliser les coordonnées géographiques pour récupérer les données de circulation
+    const response = await axioss.get(`https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json?key=R04Ot04d0NIVuxWfKGAYgwyO4mL7M6G6&point=${position.latitude},${position.longitude}`);
+    
+    console.log(response.data); // Affichez les données de circulation dans la console ou traitez-les selon vos besoins
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.detailedError) {
+      console.error('Erreur lors de la récupération des données de circulation:', error.response.data.detailedError.message);
+    } else {
+      console.error('Erreur lors de la récupération des données de circulation:', error);
+    }
+  }
+},
+getCurrentPosition() {
+  return new Promise((resolve, reject) => {
+    // Demander l'autorisation à l'utilisateur pour accéder à sa position géographique
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+      },
+      error => {
+        reject(error);
+      }
+    );
+  });
+},
     async fetchWeatherData() {
       try {
         // Demander l'autorisation à l'utilisateur pour accéder à sa position géographique
@@ -123,6 +159,7 @@ export default {
   mounted() {
     this.fetchWeatherData();
     this.fetchData();
+    this.fetchTrafficData();
   }
 }
 </script>

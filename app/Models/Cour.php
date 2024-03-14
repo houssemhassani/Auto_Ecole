@@ -12,15 +12,18 @@ class Cour extends Model
         'description',
         'date_debut',
         'date_fin',
-        'nombre_heures'
+        'nombre_heures',
+        'type',
+        'termine'
     ];
-    public function candidats()
-    {
-        return $this->belongsToMany(Candidat::class);
-    }
 
     public function monitor()
     {
         return $this->belongsTo(Monitor::class);
+    }
+
+    public function candidats()
+    {
+        return $this->belongsToMany(Candidat::class)->withPivot('type', 'termine');
     }
 }

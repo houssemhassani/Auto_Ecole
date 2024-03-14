@@ -25,6 +25,17 @@
             <input type="number" v-model="form.nombre_heures" id="nombre_heures" class="form-control">
           </div>
           <div class="mb-3">
+            <label class="form-check-label">Type de cours :</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" v-model="form.pratique" id="pratique">
+              <label class="form-check-label" for="pratique">Pratique</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" v-model="form.theorique" id="theorique">
+              <label class="form-check-label" for="theorique">Théorique</label>
+            </div>
+          </div>
+          <div class="mb-3">
             <label for="monitor_id" class="form-label">Moniteur :</label>
             <select v-model="form.monitor_id" id="monitor_id" class="form-control">
               <option value="" disabled selected>Choisissez un moniteur</option>
@@ -41,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import axios from '@/axios-config';
 import { useRouter } from 'vue-router';
 
@@ -52,28 +63,32 @@ const form = ref({
     date_debut: '',
     date_fin: '',
     nombre_heures: '',
-    monitor_id: ''
+    monitor_id: '',
+    pratique: false, // Ajout des champs pratiques et théoriques
+    theorique: false
 });
 const monitors = ref([]);
 
-onMounted(async () => {
-    try {
-        const response = await axios.get('/gestioncour/create');
-        monitors.value = response.data.monitors;
-    } catch (error) {
-        console.error('Erreur lors de la récupération des moniteurs :', error);
-    }
-});
-
 const submitCreate = async () => {
     try {
+        const type = [];
+
+        if (form.value.pratique) {
+            type.push('pratique');
+        }
+        if (form.value.theorique) {
+            type.push('theorique');
+        }
+        const typeString = type.join(', ');
+        console.log(type[0]);
         const response = await axios.post('/gestioncour/addCour', {
             titre: form.value.titre,
             description: form.value.description,
             date_debut: form.value.date_debut,
             date_fin: form.value.date_fin,
             nombre_heures: form.value.nombre_heures,
-            monitor_id: form.value.monitor_id
+            monitor_id: form.value.monitor_id,
+            type: typeString // Envoyer les types sélectionnés
         });
         console.log(response.data);
         router.push('/home');
@@ -81,4 +96,19 @@ const submitCreate = async () => {
         console.error('Erreur lors de la création du cours :', error);
     }
 }
+
+const fetchMonitors = async () => {
+    try {
+        const response = await axios.get('/gestioncour/create');
+        monitors.value = response.data.monitors;
+    } catch (error) {
+        console.error('Erreur lors de la récupération des moniteurs :', error);
+    }
+}
+
+fetchMonitors(); // Appel de la fonction pour récupérer les moniteurs au chargement du composant
 </script>
+
+<style scoped>
+/* Ajoutez vos styles CSS ici */
+</style>

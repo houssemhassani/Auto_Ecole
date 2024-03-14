@@ -18,6 +18,8 @@ class Candidat extends Model
         'adresse',
         'date_of_birth',
         'num_tel',
+        'seances_theoriques', // Ajouter cette ligne
+        'seances_pratiques',  // Ajouter cette ligne
     ];
 
     protected $casts = [
@@ -26,7 +28,7 @@ class Candidat extends Model
 
     public function cours()
     {
-        return $this->belongsToMany(Cour::class);
+        return $this->belongsToMany(Cour::class)->withPivot('type', 'termine');
     }
 
 

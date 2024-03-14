@@ -42,6 +42,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}/edit', [CourController::class, 'edit'])->name('cour.edit');
         Route::put('/update/{id}', [CourController::class, 'update'])->name('cour.update');
         Route::delete('/destroy/{id}', [CourController::class, 'destroy'])->name('cour.destroy');
+        Route::put('/finishCourse', [CourController::class, 'finishCourse'])->name('cours.finish');
+        Route::post('/getCoursesForCandidate', [CourController::class, 'getCoursesForCandidate'])->name('cours.getCoursesForCandidate');
+        Route::get('/myCourses', [CourController::class, 'myCourses'])->name('cours.myCourses');
+        Route::post('/assign-course/{id}', [CourController::class, 'assignCourseToCandidate'])->name('cour.assignCourseToCandidate');
+
     });
 
     Route::prefix('/gestionmonitor')->group(function () {
