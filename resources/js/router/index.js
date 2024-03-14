@@ -160,6 +160,18 @@ const routes = [
     name: 'ListUsers',
     meta: { requiresAuth: true },
     component: () => import("../pages/Admin/Gestion Utilisateur/ListOfUser.vue")
+  },
+  {
+    path: '/admin/gestionVehicule/listvehicules',
+    name: 'ListVehicules',
+    meta: { requiresAuth: true },
+    component: () => import("../pages/Admin/Gestion Véhicules/Vehicules.vue")
+  },
+  {
+    path: '/admin/gestionVehicule/createVehicule',
+    name: 'createVehicule',
+    meta: { requiresAuth: true },
+    component: () => import("../pages/Admin/Gestion Véhicules/CreateVehicule.vue")
   }
   // Ajoutez d'autres "routes" si nécessaire
 ];

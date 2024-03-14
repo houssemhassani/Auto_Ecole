@@ -24,6 +24,20 @@ class VehiculeController extends Controller
         $vehicles = Vehicule::all();
         return response()->json(['vehicules' => $vehicles], 200);
     }
+    public function create()
+    {
+        // Récupérer la liste des monitors
+        $monitors = DB::table('monitors')
+            ->join('users', 'monitors.id', '=', 'users.id')
+            ->select('monitors.id', 'users.name')
+
+            ->get();
+
+        $data['monitors'] = $monitors;
+
+        // Retourner la liste des monitors au format JSON
+        return response()->json($data);
+    }
 
     /**
      * Crée un nouveau véhicule.
@@ -39,7 +53,7 @@ class VehiculeController extends Controller
             'year' => 'required|integer',
             'registration_number' => 'required|string|unique:vehicules',
             'monitor_id' => 'required|exists:monitors,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+           // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $vehicle = new Vehicule([
@@ -181,7 +195,7 @@ class VehiculeController extends Controller
      */
     public function search(Request $request)
     {
-       
+
         $request->validate([
             'brand' => 'nullable|string',
             'model' => 'nullable|string',
@@ -197,17 +211,17 @@ class VehiculeController extends Controller
             $query->where('brand', $request->brand);
         }
 
-    
+
         if ($request->has('model')) {
             $query->where('model', $request->model);
         }
 
- 
+
         if ($request->has('year')) {
             $query->where('year', $request->year);
         }
 
-       
+
         if ($request->has('registration_number')) {
             $query->where('registration_number', $request->registration_number);
         }

@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <!-- Autres balises meta, stylesheets, etc. -->
 
     <!-- Ajoutez la balise script pour inclure votre application Vue.js -->

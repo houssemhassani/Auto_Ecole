@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::prefix('/gestionvehicules')->group(function () {
         Route::get('/vehicules', [VehiculeController::class, 'index']);
+        Route::get('/create', [VehiculeController::class, 'create'])->name('vehicule.create');
 
         Route::post('/addvehicules', [VehiculeController::class, 'store']);
 
