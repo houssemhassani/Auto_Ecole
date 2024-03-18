@@ -53,7 +53,7 @@ class VehiculeController extends Controller
             'year' => 'required|integer',
             'registration_number' => 'required|string|unique:vehicules',
             'monitor_id' => 'required|exists:monitors,id',
-           // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            // 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         $vehicle = new Vehicule([
@@ -83,8 +83,26 @@ class VehiculeController extends Controller
      */
     public function show($id)
     {
-        $vehicle = Vehicule::findOrFail($id);
-        return response()->json(['vehicule' => $vehicle], 200);
+        $vehicule = Vehicule::findOrFail($id);
+        $details['vehicule'] = $vehicule;
+
+        // Récupérer les détails du moniteur associé
+        $monitorDetails = DB::table('monitors')
+            ->join('users', 'monitors.id', '=', 'users.id')
+            ->select('users.name', 'monitors.num_cin', 'monitors.num_professional')
+            ->where('monitors.id', $vehicule->monitor_id)
+            ->first();
+
+        // Ajouter les détails du moniteur aux détails du véhicule
+        if ($monitorDetails) {
+            $details['monitor'] = [
+                'name' => $monitorDetails->name,
+                'num_cin' => $monitorDetails->num_cin,
+                'num_professional' => $monitorDetails->num_professional,
+            ];
+        }
+
+        return response()->json(['details' => $details], 200);
     }
 
     /**

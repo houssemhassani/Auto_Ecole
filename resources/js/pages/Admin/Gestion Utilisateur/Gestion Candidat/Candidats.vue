@@ -3,7 +3,9 @@
     <div class="row justify-content-between align-items-center mb-4">
       <h1 style="color: #40E0D0;">Liste des candidats</h1>
       <router-link to="/admin/gestioncandidat/create">
-        <button class="btn btn-primary" style="background-color: #40E0D0;">Ajouter</button>
+        <button class="btn btn-primary" style="background-color: #40E0D0;">
+          <i class="fas fa-plus"></i>
+        </button>
       </router-link>
     </div>
     <div class="row">
@@ -25,9 +27,13 @@
               <td>{{ candidat.user_email }}</td>
               <td>{{ formatDate(candidat.date_of_birth) }}</td>
               <td>
-                <button class="btn btn-danger" @click="clickDelete(candidat.id, index)">Supprimer</button>
+                <button class="btn btn-danger" @click="clickDelete(candidat.id, index)">
+                  <i class="fas fa-trash"></i>
+                </button>
                 <router-link :to="{ name: 'AssignCourse', params: { candidatId: candidat.id } }">
-                  <button class="btn btn-success">Assigner Cours</button>
+                  <button class="btn btn-success">
+                    <i class="fas fa-tasks"></i>
+                  </button>
                 </router-link>
               </td>
             </tr>
