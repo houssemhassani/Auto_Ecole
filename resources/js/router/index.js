@@ -168,6 +168,12 @@ const routes = [
     component: () => import("../pages/Admin/Gestion Véhicules/Vehicules.vue")
   },
   {
+    path: '/admin/gestionExamen/exams',
+    name: 'Examens',
+    meta: { requiresAuth: true },
+    component: () => import("../pages/Admin/Gestion Examen/Examens.vue")
+  },
+  {
     path: '/admin/gestionVehicule/createVehicule',
     name: 'createVehicule',
     meta: { requiresAuth: true },

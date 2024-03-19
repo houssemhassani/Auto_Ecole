@@ -8,6 +8,7 @@ use App\Http\Controllers\admin\AutoEcoleController;
 use App\Http\Controllers\admin\MonitorController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DemoController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,44 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/getCoursesForCandidate', [CourController::class, 'getCoursesForCandidate'])->name('cours.getCoursesForCandidate');
         Route::get('/myCourses', [CourController::class, 'myCourses'])->name('cours.myCourses');
         Route::post('/assign-course/{id}', [CourController::class, 'assignCourseToCandidate'])->name('cour.assignCourseToCandidate');
+
+    });
+    Route::prefix('/gestionQcm')->group(function () {
+        // Route::resource('/questions', QuestionController::class);
+        Route::post('/questions/store', [QuestionController::class, 'store']);
+        Route::get('/questions/getDefaultQuestions', [QuestionController::class, 'getDefaultQuestions']);
+        Route::get('/questions/AllQuestion', [QuestionController::class, 'index']);
+        Route::get('/questions/show/{questionId}', [QuestionController::class, 'show']);
+        Route::get('/questions/edit/{questionId}', [QuestionController::class, 'edit']);
+        Route::put('/questions/{question}/update', [QuestionController::class, 'update'])->name('questions.update');
+        Route::delete('questions/{questionId}/destroy', [QuestionController::class, 'destroy']);
+
+        // Route pour récupérer les questions par coefficient
+        Route::get('/questions/by-coefficient/{coefficient}', [QuestionController::class, 'getByCoefficient']);
+
+        // Route pour récupérer les questions par durée
+        Route::get('/questions/by-duration/{duration}', [QuestionController::class, 'getByDuration']);
+
+        // Route pour effectuer une recherche de questions
+        Route::post('/questions/search', [QuestionController::class, 'search']);
+
+        // Route pour stocker plusieurs questions
+        Route::post('/questions/store-multiple', [QuestionController::class, 'storeMultiple']);
+
+        // Route pour ajouter une réponse à une question
+        Route::post('/questions/{questionId}/add-answer', [QuestionController::class, 'addAnswer']);
+
+        // Route pour mettre à jour une réponse à une question
+        Route::put('/questions/{questionId}/update-answer/{answerId}', [QuestionController::class, 'updateAnswer']);
+
+        // Route pour supprimer une réponse à une question
+        Route::delete('/questions/{questionId}/delete-answer/{answerId}', [QuestionController::class, 'deleteAnswer']);
+
+        // Route pour récupérer les statistiques sur les questions et réponses
+        Route::get('/questions/stats', [QuestionController::class, 'getStats']);
+
+        // Route pour récupérer les réponses d'une question spécifique
+        Route::get('/questions/{questionId}/answers', [QuestionController::class, 'getAnswers']);
 
     });
     Route::prefix('/gestionvehicules')->group(function () {
@@ -98,7 +137,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::prefix('/gestioncandidat')->group(function () {
         Route::post('/store', [CandidatController::class, 'store'])->name('candidat.store');
-        // Route::get('/autoecoles', [CandidatController::class, 'create'])->name('monitor.create');
         Route::get('/show/{id}', [CandidatController::class, 'show'])->name('candidat.show');
         Route::delete('/destroy/{id}', [CandidatController::class, 'destroy'])->name('candidat.destroy');
         Route::get('/allcandidats', [CandidatController::class, 'index'])->name('candidat.index');
@@ -107,12 +145,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{candidatId}/courses', [CandidatController::class, 'getCoursesByCandidateId']);
         Route::post('/assign-course/{candidatId}', [CandidatController::class, 'assignCourse'])->name('candidat.assignCourse');
     });
-
     Route::post('/gestionautoecole/store', [AutoEcoleController::class, 'store'])->name('autoecole.store');
     Route::post('/users/{userId}/assign-roles', 'App\Http\Controllers\Api\UserController@assignRoles');
-
 });
-
 Route::get('demo', [GestionUserController::class, 'getOnlineUsers'])->name('');
 Route::post('/user/store', [UserController::class, 'store'])->name('store');
 Route::post('user/login', [UserController::class, 'login'])->name('login');

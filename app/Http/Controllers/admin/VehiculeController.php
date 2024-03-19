@@ -86,14 +86,11 @@ class VehiculeController extends Controller
         $vehicule = Vehicule::findOrFail($id);
         $details['vehicule'] = $vehicule;
 
-        // Récupérer les détails du moniteur associé
         $monitorDetails = DB::table('monitors')
             ->join('users', 'monitors.id', '=', 'users.id')
             ->select('users.name', 'monitors.num_cin', 'monitors.num_professional')
             ->where('monitors.id', $vehicule->monitor_id)
             ->first();
-
-        // Ajouter les détails du moniteur aux détails du véhicule
         if ($monitorDetails) {
             $details['monitor'] = [
                 'name' => $monitorDetails->name,
@@ -122,7 +119,6 @@ class VehiculeController extends Controller
             'monitor_id' => 'required|exists:monitors,id',
             'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-
         $vehicle = Vehicule::findOrFail($id);
         $vehicle->brand = $request->input('brand');
         $vehicle->model = $request->input('model');
@@ -130,7 +126,7 @@ class VehiculeController extends Controller
         $vehicle->registration_number = $request->input('registration_number');
         $vehicle->monitor_id = $request->input('monitor_id');
 
-        // Mettre à jour l'image si elle est fournie
+        
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images/vehicules');
             $vehicle->image = $imagePath;
