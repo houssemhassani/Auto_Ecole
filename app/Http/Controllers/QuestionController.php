@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Answer;
 use App\Models\Question;
+use App\Models\UserAnswer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class QuestionController extends Controller
 {
@@ -13,7 +15,53 @@ class QuestionController extends Controller
         $questions = Question::with('answers')->get();
         return response()->json(['questions' => $questions], 200);
     }
-    
+    public function getCorrectlyAnswers()
+    {
+        $answers = Answer::where('is_correct', true)->select('id', 'question_id', 'text')->get();
+
+
+        return response()->json($answers, 200);
+    }
+    public function addUserAnswers(Request $request)
+    {
+        $userAnswersData = $request->input('user_answers');
+
+        if (empty($userAnswersData)) {
+            return response()->json(['message' => 'Aucune réponse utilisateur fournie'], 400);
+        }
+
+        try {
+            // Démarrez une transaction pour vous assurer que toutes les opérations sont effectuées ou aucune
+            DB::beginTransaction();
+
+            // Tableau pour stocker les réponses utilisateur créées
+            $createdUserAnswers = [];
+
+            foreach ($userAnswersData as $userAnswerData) {
+                // Créez une nouvelle instance de UserAnswer avec les données fournies
+                $userAnswer = new UserAnswer($userAnswerData);
+
+                // Enregistrez la réponse utilisateur
+                $userAnswer->save();
+
+                // Ajoutez la réponse utilisateur créée au tableau
+                $createdUserAnswers[] = $userAnswer;
+            }
+
+            // Validez et committez la transaction
+            DB::commit();
+
+            // Retournez les réponses utilisateur créées avec succès
+            return response()->json(['user_answers' => $createdUserAnswers], 201);
+        } catch (\Exception $e) {
+            // En cas d'erreur, annulez la transaction et retournez une réponse d'erreur
+            DB::rollBack();
+            return response()->json(['message' => 'Erreur lors de l\'enregistrement des réponses utilisateur: ' . $e->getMessage()], 500);
+        }
+    }
+
+
+
 
     public function getByCoefficient($coefficient)
     {

@@ -53,7 +53,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/gestionQcm')->group(function () {
         // Route::resource('/questions', QuestionController::class);
         Route::post('/questions/store', [QuestionController::class, 'store']);
+        Route::post('/userAnswer/addUserAnswers', [QuestionController::class, 'addUserAnswers']);
+
+        
         Route::get('/questions/getDefaultQuestions', [QuestionController::class, 'getDefaultQuestions']);
+        Route::get('/questions/getCorrectlyAnswers', [QuestionController::class, 'getCorrectlyAnswers']);
         Route::get('/questions/AllQuestion', [QuestionController::class, 'index']);
         Route::get('/questions/show/{questionId}', [QuestionController::class, 'show']);
         Route::get('/questions/edit/{questionId}', [QuestionController::class, 'edit']);
